@@ -1,0 +1,47 @@
+{
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "name": "Terceiriza CS",
+  "legalName": "Terceiriza Customer LTDA",
+  "url": "https://terceirizacs.com.br",
+  "logo": "https://terceirizacs.com.br/assets/logo.png",
+  "image": "https://terceirizacs.com.br/assets/logo.png",
+  "description": "Customer Success terceirizado especializado para infoprodutores. Aumentamos a conclusão de cursos, reduzimos churn e multiplicamos vendas.",
+  "foundingDate": "2025",
+  "founder": {
+    "@type": "Person",
+    "name": "Pamela Santos",
+    "jobTitle": "Especialista em Customer Success"
+  },
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+55-31-99282-3833",
+    "contactType": "Customer Service",
+    "email": "contato@terceirizacs.com.br",
+    "availableLanguage": "Portuguese"
+  },
+  "sameAs": [
+    "https://www.instagram.com/terceirizacs"
+  ],
+  "areaServed": {
+    "@type": "Country",
+    "name": "Brasil"
+  },
+  "serviceType": [
+    "Customer Success",
+    "Customer Success Terceirizado",
+    "Gestão de Alunos",
+    "Redução de Churn",
+    "Consultoria em Customer Success"
+  ],
+  "knowsAbout": [
+    "Customer Success",
+    "Infoprodutos",
+    "Cursos Online",
+    "Gestão de Alunos",
+    "Redução de Churn",
+    "Aumento de LTV",
+    "Engajamento de Alunos"
+  ],
+  "slogan": "Customer Success Terceirizado para Infoprodutores"
+}

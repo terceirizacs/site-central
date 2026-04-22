@@ -1,0 +1,61 @@
+# Terceiriza CS
+
+Customer Success terceirizado para infoprodutores.
+
+## 🚀 Deploy
+
+Este projeto está configurado para deploy automático no Vercel.
+
+### Link do Site
+- **Produção:** https://terceirizacs.com.br (ou o domínio configurado)
+- **Preview:** Gerado automaticamente em cada PR
+
+## 📦 Stack
+
+- HTML5
+- CSS3
+- JavaScript (Vanilla)
+- Vercel (Hospedagem)
+
+## 🛠️ Desenvolvimento Local
+
+1. Clone o repositório
+2. Abra `index.html` no navegador
+3. Ou use um servidor local:
+   ```bash
+   # Com Python
+   python -m http.server 8000
+   
+   # Com Node.js (http-server)
+   npx http-server
+   ```
+
+## 📁 Estrutura
+
+```
+/
+├── index.html
+├── termos-de-uso.html
+├── politica-de-privacidade.html
+├── politica-de-cookies.html
+├── css/
+│   └── style.css
+├── js/
+│   └── script.js
+├── assets/
+│   ├── logo.png
+│   └── favicon.png
+├── vercel.json
+├── sitemap.xml
+└── robots.txt
+```
+
+## 🔧 Configuração Vercel
+
+- Clean URLs habilitado
+- Rotas configuradas
+- Otimização automática
+
+## 📝 Licença
+
+© 2025 Terceiriza CS - Todos os direitos reservados.
