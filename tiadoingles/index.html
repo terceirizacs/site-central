@@ -415,32 +415,30 @@ function showTip(e,html){initTip();_tip.innerHTML=html;_tip.classList.add('show'
 function hideTip(){if(_tip)_tip.classList.remove('show');}
 
 /* ===== STATUS LOGIC ===== */
-// Acesso vigente = criadoEm + 365 days > today
-// Sem acessar +30d = ultAcesso > 30 dias (independente de renovacao)
+// Ativo = comprou dentro do periodo de 1 ano (criadoEm + 365d > hoje)
+// Inativo = comprou ha mais de 1 ano (criadoEm + 365d <= hoje)
+// Sem acessar +30d = ultAcesso > 30 dias
 // Nunca acessou = sem ultAcesso
 function getExpiration(r){
   if(!r.criadoEm) return null;
   return r.criadoEm + 365*DAY;
 }
-function isVigente(r){
+function isAtivo(r){
   const exp=getExpiration(r);
-  if(!exp) return true;
+  if(!exp) return false;
   return exp>NOW;
 }
-function isVencido(r){return !isVigente(r);}
+function isInativo(r){return !isAtivo(r);}
 function semAcesso30(r){return r.ultAcesso&&(NOW-r.ultAcesso)>30*DAY;}
 function nuncaAcessou(r){return !r.ultAcesso&&!r.primAcesso;}
-function acessouRecente(r){return r.ultAcesso&&(NOW-r.ultAcesso)<=30*DAY;}
 
 function statusLabel(r){
-  if(nuncaAcessou(r)) return 'Nunca acessou';
-  if(semAcesso30(r)) return 'Sem acessar +30d';
-  return 'Ativo';
+  if(isAtivo(r)) return 'Ativo';
+  return 'Inativo';
 }
 function statusClass(r){
-  if(nuncaAcessou(r)) return 'nunca';
-  if(semAcesso30(r)) return 'sem30';
-  return 'ativo';
+  if(isAtivo(r)) return 'ativo';
+  return 'inativo';
 }
 
 /* ===== THEME / TABS ===== */
@@ -472,7 +470,7 @@ function buildFilters(){
     if(r.tags) r.tags.split(',').map(t=>t.trim()).filter(Boolean).forEach(t=>tagSet.add(t));
   });
   buildMS('fTags',[...tagSet].sort());
-  buildMS('fStatus',['Ativo','Sem acessar +30d','Nunca acessou']);
+  buildMS('fStatus',['Ativo','Inativo']);
 }
 
 function getFiltered(){
@@ -563,31 +561,33 @@ function renderAll(filtered){
 /* ===== VISAO GERAL ===== */
 function renderGeral(rows){
   const total=rows.length;
-  let ativos=0,sem30=0,nunca=0;
+  let vigentes=0,inativos=0,sem30=0,nunca=0;
   const consumos=[];
   rows.forEach(r=>{
-    if(nuncaAcessou(r))nunca++;
-    else if(semAcesso30(r))sem30++;
-    else ativos++;
+    if(isAtivo(r)) vigentes++;
+    else inativos++;
+    if(nuncaAcessou(r)) nunca++;
+    else if(semAcesso30(r)) sem30++;
     consumos.push(r.total||0);
   });
   const media=avg(consumos);
-  const pctAtivo=total?ativos/total*100:0;
+  const pctVigente=total?vigentes/total*100:0;
+  const pctInativo=total?inativos/total*100:0;
   const pctSem30=total?sem30/total*100:0;
   const pctNunca=total?nunca/total*100:0;
 
   const kpis=`<div class="kpis">
     <div class="kpi"><div class="kpi-bar" style="background:linear-gradient(90deg,var(--accent),var(--a2))"></div><div class="kpi-l">Total de Alunos</div><div class="kpi-v">${fN(total)}</div><div class="kpi-s">emails unicos (dedup)</div></div>
     <div class="kpi"><div class="kpi-bar" style="background:linear-gradient(90deg,var(--teal),var(--green))"></div><div class="kpi-l">Media Consumo</div><div class="kpi-v">${fP(media)}</div><div class="kpi-s">base total: ${fN(consumos.length)} alunos</div></div>
-    <div class="kpi"><div class="kpi-bar" style="background:linear-gradient(90deg,var(--green),var(--teal))"></div><div class="kpi-l">Acessaram nos ultimos 30d</div><div class="kpi-v">${fN(ativos)}</div><div class="kpi-s">${fP(pctAtivo)} da base</div></div>
+    <div class="kpi"><div class="kpi-bar" style="background:linear-gradient(90deg,var(--green),var(--teal))"></div><div class="kpi-l">Ativos</div><div class="kpi-v">${fN(vigentes)}</div><div class="kpi-s">${fP(pctVigente)} da base · compra dentro de 1 ano</div></div>
     <div class="kpi"><div class="kpi-bar" style="background:linear-gradient(90deg,var(--orange),var(--red))"></div><div class="kpi-l">Sem acessar +30d</div><div class="kpi-v">${fN(sem30)}</div><div class="kpi-s">${fP(pctSem30)} da base</div></div>
     <div class="kpi"><div class="kpi-bar" style="background:linear-gradient(90deg,var(--red),var(--pink))"></div><div class="kpi-l">Nunca Acessaram</div><div class="kpi-v">${fN(nunca)}</div><div class="kpi-s">${fP(pctNunca)} da base</div></div>
   </div>`;
 
   const legend=`<div class="legend-box">
-    <div class="lg-item"><span class="lg-dot" style="background:var(--green)"></span><strong>Ativo:</strong> acessou a plataforma nos ultimos 30 dias</div>
+    <div class="lg-item"><span class="lg-dot" style="background:var(--green)"></span><strong>Ativo:</strong> comprou dentro do periodo de 1 ano (criadoEm + 365d > hoje)</div>
+    <div class="lg-item"><span class="lg-dot" style="background:var(--red)"></span><strong>Inativo:</strong> comprou ha mais de 1 ano (acesso expirado)</div>
     <div class="lg-item"><span class="lg-dot" style="background:var(--orange)"></span><strong>Sem acessar +30d:</strong> ultimo acesso ha mais de 30 dias</div>
-    <div class="lg-item"><span class="lg-dot" style="background:var(--red)"></span><strong>Nunca acessou:</strong> nenhum login registrado na plataforma</div>
   </div>`;
 
   // Ranking by product
@@ -635,9 +635,9 @@ function renderGeral(rows){
     <div class="ins-g">
       ${bestProd?`<div class="ins ok"><div class="ins-t">Produto com mais alunos</div><div class="ins-p"><strong>${bestProd.label}</strong> com ${fN(bestProd.count)} alunos e media de consumo de ${fP(bestProd.media)}.</div></div>`:''}
       ${worstProd?`<div class="ins w"><div class="ins-t">Menor media de consumo</div><div class="ins-p"><strong>${worstProd.label}</strong> com media de apenas ${fP(worstProd.media)}.</div></div>`:''}
-      <div class="ins w"><div class="ins-t">Nunca fizeram login</div><div class="ins-p"><strong>${fN(nunca)}</strong> alunos (${fP(pctNunca)} da base) ainda nao acessaram a plataforma.</div></div>
-      <div class="ins i"><div class="ins-t">Sem acessar +30 dias</div><div class="ins-p"><strong>${fN(sem30)}</strong> alunos (${fP(pctSem30)} da base) estao ha mais de 30 dias sem acessar. Considere uma campanha de reativacao.</div></div>
-      <div class="ins ok"><div class="ins-t">Acessaram recentemente</div><div class="ins-p"><strong>${fN(ativos)}</strong> alunos (${fP(pctAtivo)}) acessaram a plataforma nos ultimos 30 dias.</div></div>
+      <div class="ins ok"><div class="ins-t">Alunos ativos</div><div class="ins-p"><strong>${fN(vigentes)}</strong> alunos (${fP(pctVigente)}) compraram dentro do periodo de 1 ano.</div></div>
+      <div class="ins w"><div class="ins-t">Alunos inativos</div><div class="ins-p"><strong>${fN(inativos)}</strong> alunos (${fP(pctInativo)}) com compra ha mais de 1 ano.</div></div>
+      <div class="ins i"><div class="ins-t">Sem acessar +30 dias</div><div class="ins-p"><strong>${fN(sem30)}</strong> alunos (${fP(pctSem30)} da base) estao ha mais de 30 dias sem acessar.</div></div>
     </div>`;
 
   document.getElementById('cGeral').innerHTML=kpis+legend+rank+insights;
