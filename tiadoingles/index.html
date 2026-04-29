@@ -894,8 +894,8 @@ function renderRenov(rows){
   const vencem120=withVenc.filter(x=>x.dias!==null&&x.dias>90&&x.dias<=120);
 
   let h=`<div class="kpis">
-    <div class="kpi"><div class="kpi-bar" style="background:linear-gradient(90deg,var(--accent),var(--a2))"></div><div class="kpi-l">Acesso Vigente</div><div class="kpi-v">${fN(ativosCount)}</div><div class="kpi-s">${fP(rows.length?ativosCount/rows.length*100:0)} da base (criadoEm + 1 ano)</div></div>
-    <div class="kpi"><div class="kpi-bar" style="background:linear-gradient(90deg,var(--red),var(--pink))"></div><div class="kpi-l">Acesso Vencido</div><div class="kpi-v">${fN(vencidos.length)}</div><div class="kpi-s">Acesso expirado (+ de 1 ano)</div></div>
+    <div class="kpi"><div class="kpi-bar" style="background:linear-gradient(90deg,var(--accent),var(--a2))"></div><div class="kpi-l">Alunos Ativos</div><div class="kpi-v">${fN(ativosCount)}</div><div class="kpi-s">${fP(rows.length?ativosCount/rows.length*100:0)} da base · compra dentro de 1 ano</div></div>
+    <div class="kpi"><div class="kpi-bar" style="background:linear-gradient(90deg,var(--red),var(--pink))"></div><div class="kpi-l">Alunos Inativos</div><div class="kpi-v">${fN(vencidos.length)}</div><div class="kpi-s">Compra ha mais de 1 ano</div></div>
     <div class="kpi"><div class="kpi-bar" style="background:linear-gradient(90deg,var(--orange),var(--gold))"></div><div class="kpi-l">Vencem em 30d</div><div class="kpi-v">${fN(vencem30.length)}</div><div class="kpi-s">Acao urgente</div></div>
     <div class="kpi"><div class="kpi-bar" style="background:linear-gradient(90deg,var(--gold),var(--sky))"></div><div class="kpi-l">Vencem 31-60d</div><div class="kpi-v">${fN(vencem60.length)}</div><div class="kpi-s">Planejar abordagem</div></div>
     <div class="kpi"><div class="kpi-bar" style="background:linear-gradient(90deg,var(--sky),var(--cyan))"></div><div class="kpi-l">Vencem 61-90d</div><div class="kpi-v">${fN(vencem90.length)}</div><div class="kpi-s">Aquecer contato</div></div>
@@ -921,7 +921,7 @@ function renderRenov(rows){
     const maxPct=Math.max(...prodVenc.map(p=>p.pct),1);
     const colPal=['#8b7cf7','#34d399','#38bdf8','#fb923c','#f472b6'];
     h+=`<div class="sec">Ativos por Produto</div>
-    <div class="card"><h3>Percentual de ativos por produto</h3><div class="d">Alunos com acesso vigente (criadoEm + 365d > hoje)</div>
+    <div class="card"><h3>Percentual de ativos por produto</h3><div class="d">Alunos que compraram dentro do periodo de 1 ano</div>
     <div class="hbar-area">
       ${prodVenc.map((p,i)=>{
         const w=Math.max(p.pct/maxPct*100,1);
@@ -961,7 +961,7 @@ function renderRenov(rows){
     <tbody>${slice.map(x=>{
       const r=x.r;
       const venc=x.dias<0;
-      const st=venc?'Vencido':(x.dias<=30?'Urgente':(x.dias<=60?'Atentar':(x.dias<=90?'Planejar':'Vigente')));
+      const st=venc?'Inativo':(x.dias<=30?'Urgente':(x.dias<=60?'Atentar':(x.dias<=90?'Planejar':'Ativo')));
       const col=venc?'var(--red)':(x.dias<=30?'var(--orange)':(x.dias<=60?'var(--gold)':(x.dias<=90?'var(--sky)':'var(--teal)')));
       const bg=venc?'rgba(248,113,113,.12)':(x.dias<=30?'rgba(251,146,60,.12)':(x.dias<=60?'rgba(251,191,36,.12)':(x.dias<=90?'rgba(56,189,248,.12)':'rgba(45,212,191,.12)')));
       return `<tr>
@@ -979,7 +979,7 @@ function renderRenov(rows){
   // Insights
   h+=`<div class="sec">Insights de Renovacao</div><div class="ins-g">`;
   if(vencidos.length>0) h+=`<div class="ins w"><div class="ins-t">${fN(vencidos.length)} acessos vencidos</div><div class="ins-p">Alunos com acesso expirado. Iniciar fluxo de reativacao ou renovacao.</div></div>`;
-  else h+=`<div class="ins ok"><div class="ins-t">Nenhum acesso vencido</div><div class="ins-p">Todos os alunos ainda possuem acesso vigente.</div></div>`;
+  else h+=`<div class="ins ok"><div class="ins-t">Todos ativos</div><div class="ins-p">Todos os alunos compraram dentro do periodo de 1 ano.</div></div>`;
   if(vencem30.length>0) h+=`<div class="ins w"><div class="ins-t">${fN(vencem30.length)} vencem nos proximos 30 dias</div><div class="ins-p">Acao urgente - iniciar campanha de renovacao agora.</div></div>`;
   if(vencem60.length>0) h+=`<div class="ins i"><div class="ins-t">${fN(vencem60.length)} vencem em 31-60 dias</div><div class="ins-p">Planejar abordagem para esses alunos.</div></div>`;
   h+=`</div>`;
