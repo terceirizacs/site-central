@@ -4,28 +4,35 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Terceiriza CS · Sistema de Avaliações</title>
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png">
+<link rel="apple-touch-icon" href="/assets/favicon.png">
+<meta name="theme-color" content="#1a1d2e">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg: #F5EFE3;
-  --bg-alt: #EFE7D5;
-  --ink: #161B25;
-  --ink-mid: rgba(22, 27, 37, 0.65);
-  --ink-low: rgba(22, 27, 37, 0.35);
-  --line: rgba(22, 27, 37, 0.18);
-  --line-bold: rgba(22, 27, 37, 0.85);
-  --accent: #2D4F4A;
-  --gold: #B8924A;
-  --serif: 'Playfair Display', Georgia, serif;
+  --bg: #1a1d2e;
+  --bg-alt: #2d3250;
+  --bg-grad: linear-gradient(135deg, #1a1d2e 0%, #2d3250 50%, #3d4470 100%);
+  --ink: #ffffff;
+  --ink-mid: rgba(255, 255, 255, 0.72);
+  --ink-low: rgba(255, 255, 255, 0.45);
+  --line: rgba(255, 255, 255, 0.12);
+  --line-bold: rgba(255, 255, 255, 0.35);
+  --accent: #4fd8c4;
+  --accent-dark: #3bb8a5;
+  --gold: #4fd8c4;
+  --serif: 'Inter', -apple-system, sans-serif;
   --sans: 'Inter', -apple-system, sans-serif;
 }
 html, body { -webkit-text-size-adjust: 100%; }
 body {
   font-family: var(--sans);
   background: var(--bg);
+  background-image: var(--bg-grad);
+  background-attachment: fixed;
   color: var(--ink);
   line-height: 1.55;
   font-size: 16px;
@@ -52,8 +59,8 @@ a { color: inherit; text-decoration: none; }
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 20% 80%, rgba(45, 79, 74, 0.08) 0%, transparent 50%),
-              radial-gradient(circle at 80% 20%, rgba(184, 146, 74, 0.08) 0%, transparent 50%);
+  background: radial-gradient(circle at 20% 80%, rgba(79, 216, 196, 0.18) 0%, transparent 55%),
+              radial-gradient(circle at 80% 20%, rgba(79, 216, 196, 0.10) 0%, transparent 55%);
   pointer-events: none;
 }
 .login-box { width: 100%; max-width: 380px; text-align: center; position: relative; z-index: 1; }
@@ -68,18 +75,19 @@ a { color: inherit; text-decoration: none; }
 }
 .brand-mark::before { content: '◇'; margin-right: 0.5em; font-size: 0.7em; color: var(--gold); }
 .login-title {
-  font-family: var(--serif);
+  font-family: var(--sans);
   font-size: 2.5rem;
-  font-weight: 500;
+  font-weight: 700;
   letter-spacing: -0.02em;
-  line-height: 1;
+  line-height: 1.05;
   margin-bottom: 0.85rem;
 }
 @media (min-width: 640px) { .login-title { font-size: 3rem; } }
-.login-title em { font-style: italic; color: var(--accent); font-weight: 500; }
-.login-sub { font-size: 0.95rem; opacity: 0.7; margin-bottom: 2.5rem; line-height: 1.55; }
+.login-title em { font-style: normal; color: var(--accent); font-weight: 700; }
+.login-sub { font-size: 0.95rem; color: var(--ink-mid); margin-bottom: 2.5rem; line-height: 1.55; }
+.login-input-wrap { position: relative; width: 100%; }
 .login-input {
-  width: 100%; padding: 1rem 0;
+  width: 100%; padding: 1rem 2.5rem 1rem 0;
   border-bottom: 1px solid var(--line-bold);
   background: transparent;
   font-size: 1.1rem;
@@ -90,23 +98,41 @@ a { color: inherit; text-decoration: none; }
 }
 .login-input::placeholder { color: var(--ink-low); letter-spacing: normal; font-weight: 300; }
 .login-input:focus { border-bottom-width: 2px; border-bottom-color: var(--accent); }
+.login-toggle {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2.25rem; height: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-low);
+  transition: color 0.2s;
+  padding: 0;
+}
+.login-toggle:hover { color: var(--accent); }
+.login-toggle svg { width: 1.15rem; height: 1.15rem; }
+.login-toggle .icon-off { display: none; }
+.login-toggle.is-visible .icon-on { display: none; }
+.login-toggle.is-visible .icon-off { display: block; }
 .login-btn {
   width: 100%;
   margin-top: 1.75rem;
   padding: 1.05rem;
-  background: var(--ink);
-  color: var(--bg);
+  background: var(--accent);
+  color: #0f1119;
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.22em;
   font-weight: 500;
   transition: background 0.2s, letter-spacing 0.3s;
 }
-.login-btn:hover { background: var(--accent); letter-spacing: 0.28em; }
+.login-btn:hover { background: var(--accent-dark); letter-spacing: 0.28em; }
 .login-error {
   margin-top: 1rem;
   font-size: 0.85rem;
-  color: #9C3026;
+  color: #ff7a8a;
   font-weight: 500;
   min-height: 1.25rem;
   letter-spacing: 0.01em;
@@ -145,16 +171,16 @@ a { color: inherit; text-decoration: none; }
 
 .dash-hero { padding: 3.5rem 1.5rem 2rem; max-width: 1100px; margin: 0 auto; }
 .dash-hero h1 {
-  font-family: var(--serif);
+  font-family: var(--sans);
   font-size: 2.5rem;
-  font-weight: 500;
+  font-weight: 800;
   letter-spacing: -0.02em;
-  line-height: 1;
+  line-height: 1.05;
   margin-bottom: 1rem;
 }
 @media (min-width: 640px) { .dash-hero h1 { font-size: 3.85rem; } }
-.dash-hero h1 em { font-style: italic; color: var(--accent); font-weight: 500; }
-.dash-hero p { font-size: 1.05rem; opacity: 0.8; line-height: 1.55; max-width: 34rem; }
+.dash-hero h1 em { font-style: normal; color: var(--accent); font-weight: 800; }
+.dash-hero p { font-size: 1.05rem; color: var(--ink-mid); line-height: 1.55; max-width: 34rem; }
 
 .cards-section { padding: 1.5rem 1.5rem 4rem; max-width: 1100px; margin: 0 auto; }
 .section-tag {
@@ -178,8 +204,12 @@ a { color: inherit; text-decoration: none; }
 .card {
   display: block;
   padding: 1.5rem;
-  border: 1px solid var(--line-bold);
-  background: rgba(255,255,255,0.45);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--ink);
   transition: all 0.25s ease;
   position: relative;
   cursor: pointer;
@@ -196,13 +226,13 @@ a { color: inherit; text-decoration: none; }
   transition: width 0.25s;
 }
 .card:hover {
-  background: var(--ink);
-  color: var(--bg);
+  background: rgba(79, 216, 196, 0.08);
+  border-color: var(--accent);
   transform: translateY(-3px);
-  border-color: var(--ink);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.35);
 }
-.card:hover::before { width: 100%; opacity: 0.15; }
-.card:hover .card-arrow { transform: translateX(6px); }
+.card:hover::before { width: 6px; }
+.card:hover .card-arrow { transform: translateX(6px); color: var(--accent); }
 .card-tag {
   font-size: 0.65rem;
   text-transform: uppercase;
@@ -213,21 +243,22 @@ a { color: inherit; text-decoration: none; }
   position: relative;
   z-index: 1;
 }
-.card:hover .card-tag { color: var(--card-color, var(--gold)); }
+.card:hover .card-tag { color: var(--accent); }
 .card-name {
-  font-family: var(--serif);
-  font-size: 1.4rem;
-  font-weight: 500;
+  font-family: var(--sans);
+  font-size: 1.35rem;
+  font-weight: 700;
   letter-spacing: -0.015em;
-  line-height: 1.15;
+  line-height: 1.2;
   margin-bottom: 0.55rem;
   position: relative;
   z-index: 1;
+  color: var(--ink);
 }
 .card-desc {
   font-size: 0.92rem;
   line-height: 1.5;
-  opacity: 0.78;
+  color: var(--ink-mid);
   margin-bottom: 1rem;
   position: relative;
   z-index: 1;
@@ -239,16 +270,17 @@ a { color: inherit; text-decoration: none; }
   padding-top: 0.85rem;
   border-top: 1px solid var(--line);
   font-size: 0.78rem;
-  opacity: 0.7;
+  color: var(--ink-low);
   position: relative;
   z-index: 1;
 }
-.card:hover .card-meta { border-top-color: rgba(245, 239, 227, 0.2); }
+.card:hover .card-meta { border-top-color: rgba(79, 216, 196, 0.25); }
 .card-arrow {
-  font-family: var(--serif);
+  font-family: var(--sans);
   font-size: 1.2rem;
-  font-weight: 400;
-  transition: transform 0.25s;
+  font-weight: 600;
+  color: var(--accent);
+  transition: transform 0.25s, color 0.25s;
 }
 
 .dash-foot {
@@ -285,29 +317,30 @@ a { color: inherit; text-decoration: none; }
   letter-spacing: 0.22em;
   font-weight: 600;
   color: var(--ink);
-  background: rgba(255,255,255,0.95);
+  background: rgba(26, 29, 46, 0.92);
   padding: 0.55rem 0.95rem;
   border: 1px solid var(--line-bold);
+  border-radius: 8px;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   transition: all 0.2s;
 }
 #btn-back-portal:hover {
-  background: var(--ink);
-  color: var(--bg);
-  border-color: var(--ink);
+  background: var(--accent);
+  color: #0f1119;
+  border-color: var(--accent);
 }
 
 /* iOS hover fix */
 @media (hover: none) {
-  .login-btn:hover { background: var(--ink); letter-spacing: 0.22em; }
-  .card:hover { background: rgba(255,255,255,0.45); color: var(--ink); transform: none; border-color: var(--line-bold); }
-  .card:hover::before { width: 4px; opacity: 1; }
-  .card:hover .card-arrow { transform: none; }
+  .login-btn:hover { background: var(--accent); letter-spacing: 0.22em; }
+  .card:hover { background: rgba(255,255,255,0.04); transform: none; border-color: var(--line); box-shadow: none; }
+  .card:hover::before { width: 4px; }
+  .card:hover .card-arrow { transform: none; color: var(--accent); }
   .card:hover .card-tag { color: var(--card-color, var(--accent)); }
   .card:hover .card-meta { border-top-color: var(--line); }
   .logout-btn:hover { opacity: 0.55; border-color: transparent; }
-  #btn-back-portal:hover { background: rgba(255,255,255,0.95); color: var(--ink); border-color: var(--line-bold); }
+  #btn-back-portal:hover { background: rgba(26, 29, 46, 0.92); color: var(--ink); border-color: var(--line-bold); }
 }
 </style>
 </head>
@@ -320,7 +353,19 @@ a { color: inherit; text-decoration: none; }
       <div class="brand-mark">Terceiriza CS</div>
       <h1 class="login-title">Sistema de<br><em>Avaliações</em></h1>
       <p class="login-sub">Acesso restrito ao sistema de mapeamento comportamental e identidade profissional.</p>
-      <input id="pwd" class="login-input" type="password" placeholder="Senha de acesso" autocomplete="off" autocapitalize="off" autocorrect="off">
+      <div class="login-input-wrap">
+        <input id="pwd" class="login-input" type="password" placeholder="Senha de acesso" autocomplete="off" autocapitalize="off" autocorrect="off">
+        <button id="btn-toggle-pwd" class="login-toggle" type="button" aria-label="Mostrar senha">
+          <svg class="icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          <svg class="icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+            <line x1="1" y1="1" x2="23" y2="23"/>
+          </svg>
+        </button>
+      </div>
       <button id="btn-login" class="login-btn">Acessar</button>
       <div id="login-err" class="login-error"></div>
       <p class="login-foot">Em caso de dúvida sobre acesso, entre em contato com a Terceiriza CS.</p>
@@ -460,9 +505,19 @@ function closeTest() {
   showScreen('screen-dashboard');
 }
 
+function togglePwdVisibility() {
+  var input = el('pwd');
+  var btn = el('btn-toggle-pwd');
+  var isPwd = input.type === 'password';
+  input.type = isPwd ? 'text' : 'password';
+  btn.classList.toggle('is-visible', isPwd);
+  btn.setAttribute('aria-label', isPwd ? 'Ocultar senha' : 'Mostrar senha');
+}
+
 function init() {
   el('btn-login').addEventListener('click', attemptLogin);
   el('pwd').addEventListener('keydown', function(e) { if (e.key === 'Enter') attemptLogin(); });
+  el('btn-toggle-pwd').addEventListener('click', togglePwdVisibility);
   el('btn-logout').addEventListener('click', logout);
   el('btn-back-portal').addEventListener('click', closeTest);
 
