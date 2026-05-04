@@ -366,7 +366,7 @@ const progColors=['var(--red)','var(--pink)','var(--orange)','var(--gold)','var(
 const tipoColors={'BUYER':'var(--green)','IMPORTED':'var(--accent)','GUEST':'var(--gold)','FREE':'var(--sky)'};
 
 let RAW_DATA=null;let TODAY_MS=0;let RAW_RENOVACOES=null;
-const FINANCEIRO_INICIO_MS=new Date(2026,1,26).getTime();// 26/02/2026 — corte para reembolsos/cancelamentos
+const FINANCEIRO_INICIO_MS=new Date(2026,4,1).getTime();// 01/05/2026 — corte para vendas/reembolsos/cancelamentos
 
 function togglePwd(){const i=document.getElementById('pwdInput');const isPass=i.type==='password';i.type=isPass?'text':'password';document.getElementById('eyeOpen').style.display=isPass?'none':'block';document.getElementById('eyeClosed').style.display=isPass?'block':'none';}
 function doLogin(){const v=document.getElementById('pwdInput').value;if(v===PWD){document.getElementById('loginScreen').style.display='none';
