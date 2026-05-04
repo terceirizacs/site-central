@@ -480,8 +480,11 @@ function aggregate(rows){
     {
       const pk=normProd(r[R.PRODUTO]);const preco=prodPrices[pk]||0;const sc=r[R.STATUS_COMPRA]||'';
       if(preco>0){
-        // Receita (compras): considera todas as datas
-        if(!sc||sc==='COMPLETE'||sc==='APPROVED'){a.fin.compras_v+=preco;a.fin.compras_n++;}
+        // Receita (compras): SÓ a partir de 26/02
+        if(!sc||sc==='COMPLETE'||sc==='APPROVED'){
+          const dtCompra=r[R.DT_APROV]||r[R.DT_COMPRA]||0;
+          if(dtCompra>=FINANCEIRO_INICIO_MS){a.fin.compras_v+=preco;a.fin.compras_n++;}
+        }
         // Reembolsos/cancelamentos/chargebacks/protestos: SÓ a partir de 26/02
         else {
           const dt=r[R.DT_APROV]||r[R.DT_COMPRA]||0;
@@ -646,7 +649,7 @@ function renderAll(rows){
   let h3='';
   // Faturamento por produto
   if(!isSingleProd){
-  const fatProd={};rows.forEach(r=>{const sc=r[R.STATUS_COMPRA];if(!sc||sc===''||sc==='COMPLETE'||sc==='APPROVED'){const pk=normProd(r[R.PRODUTO]);const preco=prodPrices[pk]||0;if(preco>0)fatProd[pk]=(fatProd[pk]||0)+preco;}});
+  const fatProd={};rows.forEach(r=>{const sc=r[R.STATUS_COMPRA];if(!sc||sc===''||sc==='COMPLETE'||sc==='APPROVED'){const dtRef=r[R.DT_APROV]||r[R.DT_COMPRA]||0;if(dtRef>=FINANCEIRO_INICIO_MS){const pk=normProd(r[R.PRODUTO]);const preco=prodPrices[pk]||0;if(preco>0)fatProd[pk]=(fatProd[pk]||0)+preco;}}});
   const fatTotal=Object.values(fatProd).reduce((s,v)=>s+v,0);
   const fatColors={...prodColors};
   let fatTT='';prodOrder.forEach(k=>{if(fatProd[k]){const pct=Math.round(fatProd[k]/fatTotal*1000)/10;fatTT+=(prodNames[k]||k)+': '+fmtR(fatProd[k])+' ('+fmtP(pct)+') · ';}});fatTT=fatTT.slice(0,-3);
@@ -661,7 +664,7 @@ function renderAll(rows){
   }
 
   // Financeiro
-  const dtMaxStr=a._dtMax?new Date(a._dtMax).toLocaleDateString('pt-BR'):'-';const dtCorteStr=new Date(FINANCEIRO_INICIO_MS).toLocaleDateString('pt-BR');h3+='<div class="sec">💰 Financeiro</div><div style="margin:-12px 0 18px;font-size:12px;color:var(--t3);font-family:JetBrains Mono">Receita: todas as vendas · Reembolsos/cancelamentos: '+dtCorteStr+' até '+dtMaxStr+'</div><div class="g5">';
+  const dtMaxStr=a._dtMax?new Date(a._dtMax).toLocaleDateString('pt-BR'):'-';const dtCorteStr=new Date(FINANCEIRO_INICIO_MS).toLocaleDateString('pt-BR');h3+='<div class="sec">💰 Financeiro</div><div style="margin:-12px 0 18px;font-size:12px;color:var(--t3);font-family:JetBrains Mono">Considerando vendas, reembolsos e cancelamentos de '+dtCorteStr+' até '+dtMaxStr+'</div><div class="g5">';
   h3+='<div class="fin"><div class="fin-icon">💳</div><div class="fin-val" style="color:var(--green)">'+fmtR(f.compras_v)+'</div><div class="fin-label">Receita de Vendas</div><div class="fin-sub">'+f.compras_n+' compras</div></div>';
   h3+='<div class="fin"><div class="fin-icon">↩️</div><div class="fin-val" style="color:var(--red)">'+fmtR(f.reembolso_v)+'</div><div class="fin-label">Reembolsos</div><div class="fin-sub">'+f.reembolso_n+' · '+fmtP(pctReemb)+'</div></div>';
   if(f.chargeback_n>0)h3+='<div class="fin"><div class="fin-icon">⚠️</div><div class="fin-val" style="color:var(--orange)">'+fmtR(f.chargeback_v)+'</div><div class="fin-label">Chargebacks</div><div class="fin-sub">'+f.chargeback_n+'</div></div>';
