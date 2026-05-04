@@ -717,7 +717,10 @@ function renderRenovacoes(rows){
   // Calcular vencimento = DT_COMPRA + 1 ano
   rows.forEach(r=>{
     if(!r[R.DT_COMPRA]){r._dtVencCalc=null;r._diasRenov=undefined;return;}
-    const vencMs=r[R.DT_COMPRA]+365.25*86400000;
+    // Ciclo de renovação: compras de 2026+ = 1 ano · compras de 2025 ou antes = 2 anos
+    const ano=new Date(r[R.DT_COMPRA]).getFullYear();
+    const cicloDias=ano>=2026?365.25:730.5;
+    const vencMs=r[R.DT_COMPRA]+cicloDias*86400000;
     r._dtVencCalc=vencMs;
     r._diasRenov=Math.floor((vencMs-hojeMs)/86400000);
   });
