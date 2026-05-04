@@ -372,7 +372,7 @@ const progOrder=['0','1-10','11-20','21-30','31-40','41-50','51-60','61-70','71-
 const progColors=['var(--red)','var(--pink)','var(--orange)','var(--gold)','var(--sky)','var(--cyan)','var(--teal)','var(--green)','var(--accent)','var(--a2)','#fff'];
 const tipoColors={'BUYER':'var(--green)','IMPORTED':'var(--accent)','GUEST':'var(--gold)','FREE':'var(--sky)'};
 
-let RAW_DATA=null;let TODAY_MS=0;let RAW_RENOVACOES=null;
+let RAW_DATA=null;let TODAY_MS=0;let RAW_RENOVACOES=null;let RAW_RENOVACAO_BR={};
 
 function togglePwd(){const i=document.getElementById('pwdInput');const isPass=i.type==='password';i.type=isPass?'text':'password';document.getElementById('eyeOpen').style.display=isPass?'none':'block';document.getElementById('eyeClosed').style.display=isPass?'block':'none';}
 function doLogin(){const v=document.getElementById('pwdInput').value;if(v===PWD){document.getElementById('loginScreen').style.display='none';
@@ -399,7 +399,7 @@ async function loadData(){
   try{
     const r=await fetch(API_URL);const d=await r.json();
     if(d.error)throw new Error(d.error);
-    RAW_DATA=d.rows;TODAY_MS=d.todayMs;RAW_RENOVACOES=d.renovacoes||null;
+    RAW_DATA=d.rows;TODAY_MS=d.todayMs;RAW_RENOVACOES=d.renovacoes||null;RAW_RENOVACAO_BR=d.renovacaoBR||{};
     document.getElementById('badgeUpdated').textContent='🟢 '+d.atualizado;
     const sets={produto:new Set(),statusCompra:new Set(),tipoAluno:new Set(),statusClub:new Set(),funilCalc:new Set()};
     RAW_DATA.forEach(r=>{if(r[R.PRODUTO])sets.produto.add(r[R.PRODUTO]);if(r[R.STATUS_COMPRA])sets.statusCompra.add(r[R.STATUS_COMPRA]);if(r[R.TIPO_ALUNO])sets.tipoAluno.add(r[R.TIPO_ALUNO]);if(r[R.STATUS_CLUB])sets.statusClub.add(r[R.STATUS_CLUB]);if(r[R.FUNIL])sets.funilCalc.add(r[R.FUNIL]);});
@@ -716,13 +716,22 @@ function renderRenovacoes(rows){
 
   // Calcular vencimento = DT_COMPRA + 1 ano
   rows.forEach(r=>{
-    if(!r[R.DT_COMPRA]){r._dtVencCalc=null;r._diasRenov=undefined;return;}
-    // Ciclo de renovação: compras de 2026+ = 1 ano · compras de 2025 ou antes = 2 anos
-    const ano=new Date(r[R.DT_COMPRA]).getFullYear();
-    const cicloDias=ano>=2026?365.25:730.5;
-    const vencMs=r[R.DT_COMPRA]+cicloDias*86400000;
+    const email=(r[R.EMAIL]||'').toLowerCase();
+    const br=email&&RAW_RENOVACAO_BR?RAW_RENOVACAO_BR[email]:null;
+    let vencMs=null;
+    if(br&&br.dtVenc){
+      // Fonte primária: aba Renovacao (BR) — usa dtVenc calculado a partir de mês/ano fim de acesso
+      vencMs=br.dtVenc;
+    } else if(r[R.DT_COMPRA]){
+      // Fallback: regra padrão (2026+ = 1 ano · ≤2025 = 2 anos)
+      const ano=new Date(r[R.DT_COMPRA]).getFullYear();
+      const cicloDias=ano>=2026?365.25:730.5;
+      vencMs=r[R.DT_COMPRA]+cicloDias*86400000;
+    }
+    if(!vencMs){r._dtVencCalc=null;r._diasRenov=undefined;return;}
     r._dtVencCalc=vencMs;
     r._diasRenov=Math.floor((vencMs-hojeMs)/86400000);
+    r._fonteRenov=br&&br.dtVenc?'BR':'auto';
   });
 
   function isVencido(r){
